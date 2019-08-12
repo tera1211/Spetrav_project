@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css?family=Beth+Ellen&display=swap');
+
+*{
+    padding:0;
+    margin:0;
+    
+}
+.navbar-brand{
+    font-family: 'Beth Ellen', cursive;
+}

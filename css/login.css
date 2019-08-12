@@ -1,0 +1,17 @@
+
+
+body{
+    background: url(../images/tongariro.jpg);
+    background-size:cover;
+    background-position:center;
+    height: 100vh;
+    width:100vw;
+}
+
+.card{
+    background:rgba(85, 40, 1, 0.7);
+    margin-top:7rem;
+    width:50%;
+    color:white;
+}
+

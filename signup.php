@@ -1,0 +1,200 @@
+<?php
+require_once 'classes/Country.php';
+require_once 'classes/User.php';
+require_once 'classes/Profile.php';
+$country=new Country;
+$user=new User;
+$profile=new Profile;
+$err_msg=null;
+$duplicate_msg=null;
+$page_flag=0;
+$country_list=$country->display_all_countries();
+
+if(isset($_POST['confirm'])){
+  $email=$_POST['email'];
+  $count=$user->search_adduser_duplicate($email);
+  if($count['duplicate']==0 && $_POST['password']==$_POST['password_confirm']){
+    $page_flag=1;
+    $country_id=$_POST['country'];
+    $country_info=$country->get_country_info($country_id);
+  }else{
+    if($count['duplicate']>0){
+      $duplicate_msg="<div class='alert alert-danger'> E-mail already exists</div>";
+    }
+    if($_POST['password'] != $_POST['password_confirm']){
+      $err_msg="<div class='alert alert-danger'>Password does not match</div>";
+    }
+  }
+}elseif(isset($_POST['register'])){
+  $firstname=$_POST['firstname'];
+  $lastname=$_POST['lastname'];
+  $username=$_POST['username'];
+  $birthday=$_POST['birthday'];
+  $country_id=$_POST['country'];
+  $email=$_POST['email'];
+  $password=$_POST['password'];
+  $self_introduction=$_POST['self_introduction'];
+  $user_id=$user->add_user($username,$email,$password);
+  if($user_id){
+    $profile->add_profile($firstname,$lastname,$country_id,$birthday,$self_introduction,$user_id);
+    $_SESSION['message']="<div class='alert alert-success'>User registered successfully</div>";
+  }
+
+}
+
+?>
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>SPETRAV</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="css/signup.css"> -->
+  </head>
+  <body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark py-4">
+            <div class="container">
+                <a class="navbar-brand" href="#">SPETRAV</a>
+                <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#collapsibleNavId" aria-controls="collapsibleNavId"
+                    aria-expanded="false" aria-label="Toggle navigation"></button>
+                <div class="collapse navbar-collapse" id="collapsibleNavId">
+                    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="#">Home</a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href="contact.php">Contact</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="signup.php">Sign up</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="login.php">Log in</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header> 
+    <main>
+      <?php if($page_flag===1):?>
+      <div class="container">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-title">Confirm</h4>
+          </div>
+          <div class="card-body">
+            <table class="table table-striped">
+              <tr>
+                <th>Name</th>
+                <td><?php echo $_POST['firstname']." ".$_POST['lastname']?></td>
+              </tr>
+              <tr>
+                <th>Birthday</th>
+                <td><?php echo $_POST['birthday']?></td>
+              </tr>
+              <tr>
+                <th>Country</th>
+                <td><?php echo $country_info['countryName']?></td>
+              </tr>
+              <tr>
+                <th>E-mail</th>
+                <td><?php echo $_POST['email']?></td>
+              </tr>
+              <tr>
+                <th>Password</th>
+                <td><?php echo str_repeat("*",mb_strlen($_POST['password'],"UTF8"));?></td>
+              </tr>
+              <tr>
+                <th>Self introduction</th>
+                <td><?php echo $_POST['self_introduction']?></td>
+              </tr>
+            </table>
+          </div>
+          <div class="card-footer">
+            <form method="POST">
+              <button type="submit" class="btn btn-dark" name="register">Register</button>
+              <button type="submit" class="btn btn-outline-secondary" name="back">back</button>
+              <input type="hidden" name="firstname" value="<?php echo $_POST['firstname']?>">
+              <input type="hidden" name="lastname" value="<?php echo $_POST['lastname']?>">
+              <input type="hidden" name="birthday" value="<?php echo $_POST['birthday']?>">
+              <input type="hidden" name="country" value="<?php echo $_POST['country']?>">
+              <input type="hidden" name="email" value="<?php echo $_POST['email']?>">
+              <input type="hidden" name="password" value="<?php echo $_POST['password']?>">
+              <input type="hidden" name="self_introduction" value="<?php echo $_POST['self_introduction']?>">
+            </form>
+          </div>
+        </div>
+      </div>
+      <?php else:?>
+      <div class="container">
+        <div class="card mt-3 mb-3">
+          <div class="card-header">
+            <h4 class="card-title">Sign up</h4>
+          </div>
+          <div class="card-body">
+            <form action="" method="POST" enctype="multipart/form-data">
+              <div class="row">
+                <div class="form-group col-6">
+                  <label for="firstname">First name</label>
+                  <input type="text" name="firstname" id="" class="form-control" placeholder="first name" required <?php if(isset($_POST['firstname'])):?> value="<?php echo $_POST['firstname']?>" <?php endif ?>>
+                </div>
+                <div class="form-group col-6">
+                  <label for="lastname">Last name</label>
+                  <input type="text" name="lastname" id="" class="form-control" placeholder="last name" required <?php if(isset($_POST['lastname'])):?> value="<?php echo $_POST['lastname']?>" <?php endif ?>>
+                </div>
+                <div class="form-group col-12">
+                  <label for="lastname">Username</label>
+                  <input type="text" name="username" id="" class="form-control" placeholder="last name" required <?php if(isset($_POST['lastname'])):?> value="<?php echo $_POST['lastname']?>" <?php endif ?>>
+                </div>
+                <div class="form-group col-6">
+                  <label for="birthday">Birthday</label>
+                  <input type="date" name="birthday" id="" class="form-control"required <?php if(isset($_POST['birthday'])):?> value="<?php echo $_POST['birthday']?>" <?php endif ?>>
+                </div>
+                <div class="form-group col-6">
+                  <label for="country">Country</label>
+                  <select class="form-control" name="country" id="">
+                  <option value="">choose...</option>
+                  <?php foreach($country_list as $key=>$values):?>
+                    <option value="<?php echo $values['country_id']?>"<?php if(isset($_POST['country'])){if($_POST['country']==$values['country_id']){echo 'selected';}}?>><?php echo $values['countryName']?></option>
+                  <?php endforeach ?>
+                  </select>
+                </div>
+                <div class="form-group col-12">
+                  <label for="email">E-mail</label>
+                  <input type="email" name="email" id="" class="form-control" placeholder="E-mail" <?php if(!empty($duplicate_msg)):?> style="background-color:pink"<?php endif ?>required <?php if(isset($_POST['email'])):?> value="<?php echo $_POST['email']?>" <?php endif ?>>
+                </div>
+                <?php echo $duplicate_msg?>
+                <div class="form-group col-12">
+                  <label for="password">Password</label>
+                  <input type="password" name="password" id="" class="form-control" placeholder="password"<?php if(!empty($err_msg)):?>style="background-color:pink"<?php endif ?>>
+                </div>
+                <div class="form-group col-12">
+                  <label for="password_confirm">Password confirm</label>
+                  <input type="password" name="password_confirm" id="" class="form-control" placeholder="password confirm" <?php if(!empty($err_msg)):?>style="background-color:pink"<?php endif ?>>
+                </div>
+                <?php echo $err_msg ?>
+                <div class="form-group col-12">
+                  <label for="self_introduction">Self introduction</label>
+                  <textarea name="self_introduction" class="form-control" id="" cols="30" rows="10"><?php if(isset($_POST['self_introduction'])){echo $_POST['self_introduction'];}?></textarea>
+                </div>
+              </div>
+              <button type="submit" name="confirm" class="btn btn-dark">Confirm</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    <?php endif ?>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </body>
+</html>
