@@ -22,7 +22,7 @@ class Country extends Config{
     }
 
     public function get_country_info($country_id){
-        $sql = "SELECT * FROM countries WHERE country_id='$country_id'";
+        $sql = "SELECT * FROM countries WHERE id='$country_id'";
         $result=$this->conn->query($sql);
         $id=$result->fetch_assoc();
         return $id;

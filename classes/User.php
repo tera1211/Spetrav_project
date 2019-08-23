@@ -25,14 +25,26 @@ class User extends Config{
         $this->conn->close();
     }
 
-    public function update_user($email,$user_id){
-        $sql = "UPDATE users SET user_email='$email' WHERE user_id='$user_id'";
+    public function search_updateuser_duplicate($email,$user_id){
+        $sql="SELECT COUNT(*) AS duplicate FROM users WHERE user_email='$email' AND user_id != '$user_id' AND user_status='A'";
         $result=$this->conn->query($sql);
-        if($result==TRUE){
-            $this->redirect('dashboard.php');
-        }else{
-            echo "ERROR:".$this->conn->error;
-        }
+        $count=$result->fetch_assoc();
+        return $count;
+        $this->conn->close();
+    }
+
+    public function update_user($email,$username,$user_id){
+        $sql = "UPDATE users SET user_email='$email', user_name='$username' WHERE user_id='$user_id'";
+        $result=$this->conn->query($sql);
+        return $result;
+        $this->conn->close();
+    }
+
+    public function update_password($password,$user_id){
+        $hash_password=md5($password);
+        $sql="UPDATE users SET user_password='$hash_password' WHERE user_id='$user_id' ";
+        $result=$this->conn->query($sql);
+        return $result;
         $this->conn->close();
     }
 

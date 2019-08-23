@@ -1,5 +1,3 @@
-<?php require_once 'dashboard.php'; ?>
-
 <footer class="sticky-footer bg-white">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
@@ -33,7 +31,7 @@
         <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
         <div class="modal-footer">
           <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-          <a class="btn btn-primary" href="login.html">Logout</a>
+          <a class="btn btn-primary" href="../../logout.php">Logout</a>
         </div>
       </div>
     </div>
@@ -55,7 +53,47 @@
 
   <!-- Page level custom scripts -->
   <script src="../js/demo/datatables-demo.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $("#country").change(function(event){
+        var country_id=$("#country").val();
+        $.ajax({
+          type:"POST",
+          url:"../states/states.php",
+          data:{id:country_id},
+          success:function(response)
+          {
+            $("#state-select").html(response);
+          }
+        });
+      });
+    });
 
+    function citySelect() {
+        var state_id=$("#state").val();
+        $.ajax({
+          type:"POST",
+          url:"../cities/cities.php",
+          data:{id:state_id},
+          success:function(response)
+          {
+            $("#city-select").html(response);
+          }
+        });
+      }
+    
+    // function placeSelect(){
+    //   var city_id=$("#city").val();
+    //   $.ajax({
+    //     type:"POST",
+    //     url:"../places/places.php",
+    //     data:{id:city_id},
+    //     success:function(response){
+    //       $("#place-select").html(response);
+    //     }
+    //   });
+    // }
+  </script> 
 </body>
 
 </html>
